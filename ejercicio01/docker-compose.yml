@@ -1,0 +1,14 @@
+version: '3.5'
+services:
+    clientes-server:
+        container_name: clientes-service
+        build:
+            dockerfile: Dockerfile
+        image: clientes-service:latest
+        ports:
+            - 8080:8080
+        networks:
+            - spring-cloud-network
+networks:
+    spring-cloud-network:
+        driver: bridge

@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "6eb35d08-4052-4e14-9e50-f9431c6236d2",
+		"name": "Ejercicio01",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "All",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/clientes/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/clientes/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nombre\":\"Nicolas\",\r\n    \"apellido\":\"Boari\",\r\n    \"cuil\":\"23123456789\",\r\n    \"tipoDocumento\":\"DNI\",\r\n    \"nroDocumento\":12345678,\r\n    \"esEmpleadoBNA\":true,\r\n    \"paisOrigen\":\"Argentina\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/clientes/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\r\n        \"nombre\": \"Cristian\",\r\n        \"apellido\": \"Gomez\",\r\n        \"cuil\": \"23123456788\",\r\n        \"tipoDocumento\": \"DNI\",\r\n        \"nroDocumento\": 12345678,\r\n        \"esEmpleadoBNA\": true,\r\n        \"paisOrigen\": \"Argentina\"\r\n    }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/clientes/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
