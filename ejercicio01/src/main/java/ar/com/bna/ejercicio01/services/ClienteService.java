@@ -23,6 +23,10 @@ public class ClienteService {
 		return clienteRepository.findById(id);
 	}
 
+	public Optional<Cliente> getClienteByCuil(String cuil) {
+		return clienteRepository.findByCuil(cuil);
+	}
+
 	public Cliente addCliente(Cliente cliente) {
 		return clienteRepository.save(cliente);
 	}
