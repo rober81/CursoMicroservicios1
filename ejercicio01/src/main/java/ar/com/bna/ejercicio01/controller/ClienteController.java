@@ -1,5 +1,6 @@
 package ar.com.bna.ejercicio01.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ar.com.bna.ejercicio01.model.Cliente;
@@ -28,8 +30,20 @@ public class ClienteController {
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<List<Cliente>> getClientes() {
-		return new ResponseEntity<>(clienteService.list(), HttpStatus.OK);
+	public ResponseEntity<List<Cliente>> getClientes(@RequestParam Optional<String> cuil) {
+		if (!cuil.isPresent())
+			return new ResponseEntity<>(clienteService.list(), HttpStatus.OK);
+		else {
+			List<Cliente> response = new ArrayList<Cliente>();
+
+			Optional<Cliente> cliente = clienteService.getClienteByCuil(cuil.get());
+
+			if (!cliente.isPresent())
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+			response.add(cliente.get());
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
 	}
 
 	@GetMapping("/{id}")
