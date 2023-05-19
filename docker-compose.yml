@@ -1,0 +1,73 @@
+version: '3.5'
+services:
+    clientes-server:
+        container_name: clientes-service
+        build:
+            context: ./ejercicio01
+            dockerfile: Dockerfile
+        image: clientes-service:latest
+        depends_on:
+            - kafka
+        ports:
+            - 8080:8080
+        environment:
+            - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        networks:
+            - microservicios-network
+
+    zookeeper:
+        image: confluentinc/cp-zookeeper:latest
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        ports:
+            - 22181:2181
+        networks:
+        - microservicios-network
+
+    kafka:
+        image: confluentinc/cp-kafka:latest
+        depends_on:
+            - zookeeper
+        ports:
+            - 9092:9092
+            - 29092:29092
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://host.docker.internal:9092,PLAINTEXT_INTERNAL://broker:29092
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+        networks:
+        - microservicios-network
+
+    transferencias-server:
+        container_name: transferencias-service
+        build:
+            context: ./api-transferencia-curso-ms
+            dockerfile: Dockerfile
+        image: transferencias-service:latest
+        depends_on:
+            - clientes-server
+            - kafka
+        ports:
+            - 8090:8090
+        networks:
+            - microservicios-network
+
+    redis:
+        image: 'bitnami/redis:latest'    
+        environment:
+        - REDIS_PORT_NUMBER=7000
+        - ALLOW_EMPTY_PASSWORD=yes        
+        ports:
+        - '7000:7000'
+        networks:
+            - microservicios-network
+
+networks:
+    microservicios-network:
+        driver: bridge
