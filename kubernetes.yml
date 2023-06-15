@@ -1,0 +1,398 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microservicios
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clientes-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clientes-service
+  template:
+    metadata:
+      labels:
+        app: clientes-service
+    spec:
+      containers:
+        - name: clientes-service
+          image: rpiombi/clientes-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: OTEL_SERVICE_NAME
+              value: clientesApi
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_TRACES_EXPORTER
+              value: jaeger
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: http://jaeger:14250
+          readinessProbe:
+            httpGet:
+              path: /clientes/actuator/health
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /clientes/actuator/health
+              port: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clientes-service
+spec:
+  selector:
+    app: clientes-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: confluentinc/cp-zookeeper:latest
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+            - name: ZOOKEEPER_TICK_TIME
+              value: "2000"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: confluentinc/cp-kafka:latest
+          env:
+            - name: KAFKA_BROKER_ID
+              value: "1"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: zookeeper:2181
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: PLAINTEXT://host.docker.internal:9092,PLAINTEXT_INTERNAL://broker:29092
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transferencias-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transferencias-service
+  template:
+    metadata:
+      labels:
+        app: transferencias-service
+    spec:
+      containers:
+        - name: transferencias-service
+          image: rpiombi/transferencias-service:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: API_CONFIG_CLIENTE_URL
+              value: http://clientes-service:8080/clientes/
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS
+              value: kafka:9092
+            - name: OTEL_SERVICE_NAME
+              value: transferenciasApi
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_TRACES_EXPORTER
+              value: jaeger
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: http://jaeger:14250
+            - name: REDIS_SERVER
+              value: redis
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transferencias-service
+spec:
+  selector:
+    app: transferencias-service
+  ports:
+    - protocol: TCP
+      port: 8090
+      targetPort: 8090
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: bitnami/redis:latest
+          env:
+            - name: REDIS_PORT_NUMBER
+              value: "7000"
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:8.3.3
+          env:
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: ES_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+            - name: discovery.type
+              value: single-node
+            - name: xpack.security.enabled
+              value: "false"
+          ports:
+            - containerPort: 9200
+          volumeMounts:
+            - name: elasticsearch-data
+              mountPath: /usr/share/elasticsearch/data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+        - name: kibana
+          image: docker.elastic.co/kibana/kibana:8.3.3
+          env:
+            - name: ELASTICSEARCH_URL
+              value: http://elasticsearch:9200
+            - name: ELASTICSEARCH_HOSTS
+              value: '["http://elasticsearch:9200"]'
+          ports:
+            - containerPort: 5601
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+spec:
+  selector:
+    app: kibana
+  ports:
+    - protocol: TCP
+      port: 5601
+      targetPort: 5601
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: docker.elastic.co/logstash/logstash:8.3.3
+          volumeMounts:
+            - name: logstash-config
+              mountPath: /usr/share/logstash/config/logstash.yml
+              subPath: logstash.yml
+            - name: logstash-pipeline
+              mountPath: /usr/share/logstash/pipeline
+          ports:
+            - containerPort: 5044
+            - containerPort: 5000
+            - containerPort: 9600
+          env:
+            - name: LS_JAVA_OPTS
+              value: "-Xmx256m -Xms256m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+spec:
+  selector:
+    app: logstash
+  ports:
+    - protocol: TCP
+      port: 5044
+      targetPort: 5044
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+    - protocol: TCP
+      port: 9600
+      targetPort: 9600
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+    spec:
+      containers:
+        - name: jaeger
+          image: jaegertracing/all-in-one:latest
+          ports:
+            - containerPort: 16686
+            - containerPort: 14250
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger
+spec:
+  selector:
+    app: jaeger
+  ports:
+    - protocol: TCP
+      port: 16686
+      targetPort: 16686
+    - protocol: TCP
+      port: 14250
+      targetPort: 14250
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-data
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
