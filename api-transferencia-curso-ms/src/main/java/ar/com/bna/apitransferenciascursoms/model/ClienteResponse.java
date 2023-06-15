@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ClienteResponse {
-    private Integer id;
+	private Integer id;
 	private String nombre;
 	private String apellido;
 	private String cuil;

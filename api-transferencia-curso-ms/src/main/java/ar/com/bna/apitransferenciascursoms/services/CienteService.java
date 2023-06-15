@@ -8,6 +8,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -44,6 +46,7 @@ public class CienteService implements IClienteService {
             return true;
 
         try {
+        	System.out.println(config.getApiClienteUrl());
             response = restTemplate.exchange(
                     buildUrl(config.getApiClienteUrl(), cuil),
                     HttpMethod.GET,
@@ -61,8 +64,7 @@ public class CienteService implements IClienteService {
         ArrayList<ClienteResponse> cliente = response.getBody();
 
         if (cliente != null) {
-            clienteRepository
-                    .save(new Cliente(cliente.get(0).getId(), cliente.get(0).getCuil(), cliente.get(0).getNombre()));
+            clienteRepository.save(new Cliente(cliente.get(0).getId(), cliente.get(0).getCuil(), cliente.get(0).getNombre()));
             log.info("Se recupero el cliente del servicio de clientes y se guardo en cache");
 
             return true;

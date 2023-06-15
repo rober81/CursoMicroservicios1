@@ -46,9 +46,17 @@ public class ClienteController {
 		}
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<Cliente> getClienteById(@PathVariable int id) {
-		Optional<Cliente> clientes = clienteService.getClienteById(id);
+//	@GetMapping("/{id}")
+//	public ResponseEntity<Cliente> getClienteById(@PathVariable int id) {
+//		Optional<Cliente> clientes = clienteService.getClienteById(id);
+//		if (clientes.isPresent())
+//			return new ResponseEntity<>(clientes.get(), HttpStatus.OK);
+//		return new ResponseEntity<>(new Cliente(), HttpStatus.OK);
+//	}
+	
+	@GetMapping("/{cuil}")
+	public ResponseEntity<Cliente> getClienteByCuil(@PathVariable String cuil) {
+		Optional<Cliente> clientes = clienteService.getClienteByCuil(cuil);
 		if (clientes.isPresent())
 			return new ResponseEntity<>(clientes.get(), HttpStatus.OK);
 		return new ResponseEntity<>(new Cliente(), HttpStatus.OK);
