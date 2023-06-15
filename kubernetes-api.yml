@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clientes-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: clientes-service
+  minReadySeconds: 30
+  template:
+    metadata:
+      labels:
+        app: clientes-service
+    spec:
+      containers:
+        - name: clientes-service
+          image: rpiombi/clientes-service:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: 192.168.0.58:9092
+            - name: OTEL_SERVICE_NAME
+              value: clientesApi
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_TRACES_EXPORTER
+              value: jaeger
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: http://192.168.0.58:14250
+          readinessProbe:
+            httpGet:
+              path: /clientes/actuator/health
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /clientes/actuator/health
+              port: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clientes-service
+spec:
+  selector:
+    app: clientes-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transferencias-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transferencias-service
+  minReadySeconds: 30
+  template:
+    metadata:
+      labels:
+        app: transferencias-service
+    spec:
+      containers:
+        - name: transferencias-service
+          image: rpiombi/transferencias-service:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: API_CONFIG_CLIENTE_URL
+              value: http://192.168.0.58:8080/clientes/
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: 192.168.0.58:9092
+            - name: SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS
+              value: 192.168.0.58:9092
+            - name: OTEL_SERVICE_NAME
+              value: transferenciasApi
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_TRACES_EXPORTER
+              value: jaeger
+            - name: OTEL_EXPORTER_JAEGER_ENDPOINT
+              value: http://192.168.0.58:14250
+            - name: REDIS_SERVER
+              value: redis
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transferencias-service
+spec:
+  selector:
+    app: transferencias-service
+  ports:
+    - protocol: TCP
+      port: 8090
+      targetPort: 8090
