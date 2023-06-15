@@ -2,7 +2,7 @@ version: '3.5'
 services:
     clientesApi:
         container_name: clientes-service
-        image: rpiombi/curso:clientes-service
+        image: rpiombi/clientes-service:latest
         depends_on:
             - kafka
             - jaeger
@@ -49,7 +49,7 @@ services:
 
     transferenciasApi:
         container_name: transferencias-service
-        image: rpiombi/curso:transferencias-service
+        image: rpiombi/transferencias-service:latest
         depends_on:
             - clientesApi
             - kafka
