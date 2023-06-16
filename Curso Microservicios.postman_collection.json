@@ -1,0 +1,194 @@
+{
+	"info": {
+		"_postman_id": "e43ca788-2378-4077-beea-1c9f438cdd81",
+		"name": "Curso Microservicios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16694887"
+	},
+	"item": [
+		{
+			"name": "Clientes get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/clientes/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clientes Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/clientes/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transferencias",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cuilOrigen\": \"23123456788\",\r\n  \"cbuOrigen\": \"1234657890\",\r\n  \"cuilDestino\": \"23123456789\",\r\n  \"cbuDestino\": \"9876543210\",\r\n  \"importe\": 500,\r\n  \"concepto\": \"Curso\",\r\n  \"descripcion\": \"Microservicios\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/transferencias/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"transferencias",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transferencias Health",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cuilOrigen\": \"23123456788\",\r\n  \"cbuOrigen\": \"1234657890\",\r\n  \"cuilDestino\": \"23123456789\",\r\n  \"cbuDestino\": \"9876543210\",\r\n  \"importe\": 500,\r\n  \"concepto\": \"Curso\",\r\n  \"descripcion\": \"Microservicios\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8090/transferencias/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"transferencias",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clientes get cuil",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/clientes/23123456789",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						"23123456789"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clientes add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nombre\":\"Nicolas\",\r\n    \"apellido\":\"Boari\",\r\n    \"cuil\":\"23123456789\",\r\n    \"tipoDocumento\":\"DNI\",\r\n    \"nroDocumento\":12345678,\r\n    \"esEmpleadoBNA\":true,\r\n    \"paisOrigen\":\"Argentina\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/clientes/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clientes update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\r\n        \"nombre\": \"Cristian\",\r\n        \"apellido\": \"Gomez\",\r\n        \"cuil\": \"23123456788\",\r\n        \"tipoDocumento\": \"DNI\",\r\n        \"nroDocumento\": 12345678,\r\n        \"esEmpleadoBNA\": true,\r\n        \"paisOrigen\": \"Argentina\"\r\n    }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/clientes/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"clientes",
+						"3"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
