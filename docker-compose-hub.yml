@@ -26,7 +26,7 @@ services:
         ports:
             - 22181:2181
         networks:
-        - microservicios-network
+            - microservicios-network
 
     kafka:
         image: confluentinc/cp-kafka:latest
@@ -45,7 +45,7 @@ services:
             KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
             KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
         networks:
-        - microservicios-network
+            - microservicios-network
 
     transferenciasApi:
         container_name: transferencias-service
