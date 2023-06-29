@@ -21,12 +21,12 @@ pipeline {
         stage('Build and Push Docker Images') {
             steps {
                 dir('api-transferencia-curso-ms') {
-                    bat 'docker build -t rpiombi/transferencias-service:latest ./api-transferencia-curso-ms/'
+                    bat 'docker build -t rpiombi/transferencias-service:latest .'
                     bat 'docker push rpiombi/transferencias-service:latest'
                 }
                 
                 dir('ejercicio01') {
-                    bat 'docker build -t rpiombi/clientes-service:latest ./ejercicio01/'
+                    bat 'docker build -t rpiombi/clientes-service:latest .'
                     bat 'docker push rpiombi/clientes-service:latest'
                 }
             }
