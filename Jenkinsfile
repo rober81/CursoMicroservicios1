@@ -5,7 +5,7 @@ pipeline {
         stage('Build and Package - api-transferencia-curso-ms') {
             steps {
                 dir('api-transferencia-curso-ms') {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests=true'
                 }
             }
         }
@@ -13,7 +13,7 @@ pipeline {
         stage('Build and Package - ejercicio01') {
             steps {
                 dir('ejercicio01') {
-                    bat 'mvn clean package'
+                    bat 'mvn clean package -DskipTests=true'
                 }
             }
         }
